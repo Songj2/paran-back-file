@@ -7,7 +7,9 @@ import java.util.Arrays;
 @Getter
 public enum FileType {
     USER(0, "user"),
-    ROOM(1, "room");
+    ROOM(1, "room"),
+    ABOARD(2, "aBoard"),
+    BOARD(3, "board");
 
     private final int code;
     private final String type;
