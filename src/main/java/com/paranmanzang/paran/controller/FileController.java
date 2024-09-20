@@ -1,7 +1,7 @@
-package com.paranmazang.paran.controller;
+package com.paranmanzang.paran.controller;
 
-import com.paranmazang.paran.model.domain.FileDeleteModel;
-import com.paranmazang.paran.service.FileService;
+import com.paranmanzang.paran.model.domain.FileDeleteModel;
+import com.paranmanzang.paran.service.FileServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,8 @@ import java.io.IOException;
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
 public class FileController {
-    private final FileService fileService;
+    private final FileServiceImpl fileService;
+
 
     @GetMapping("/list/{refId}")
     @Operation(summary = "리스트 조회", description = "type의 refId인 파일 path 리스트를 조회합니다.", tags = {"01. File",})
