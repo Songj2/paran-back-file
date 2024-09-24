@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
+import com.paranmanzang.paran.model.domain.FileModel;
 import com.paranmanzang.paran.model.entity.File;
 import com.paranmanzang.paran.model.domain.FileDeleteModel;
 import com.paranmanzang.paran.model.enums.FileType;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -65,8 +67,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Mono<?> getPathList(Long refId, String type) {
-        return fileRepository.findByRefId(refId, FileType.fromType(type).getCode()).then();
+    public List<?> getPathList(Long refId, String type) {
+        return fileRepository.findByRefId(refId, FileType.fromType(type).getCode())
+                .map(file ->
+                        new FileModel(file.getId(), FileType.fromCode(file.getType()).getType(), file.getPath(), file.getRefId(), file.getUploadAt()))
+                .collectList().block();
     }
 
     @Override
