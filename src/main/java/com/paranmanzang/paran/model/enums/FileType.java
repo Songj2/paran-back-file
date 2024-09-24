@@ -9,7 +9,8 @@ public enum FileType {
     USER(0, "user"),
     ROOM(1, "room"),
     ABOARD(2, "aBoard"),
-    BOARD(3, "board");
+    BOARD(3, "board"),
+    BOOK(4, "book");
 
     private final int code;
     private final String type;

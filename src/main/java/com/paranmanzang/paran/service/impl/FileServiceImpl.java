@@ -1,4 +1,4 @@
-package com.paranmanzang.paran.service;
+package com.paranmanzang.paran.service.impl;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -9,6 +9,7 @@ import com.paranmanzang.paran.model.entity.File;
 import com.paranmanzang.paran.model.domain.FileDeleteModel;
 import com.paranmanzang.paran.model.enums.FileType;
 import com.paranmanzang.paran.model.repository.FileRepository;
+import com.paranmanzang.paran.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,6 @@ public class FileServiceImpl implements FileService {
 
     private final AmazonS3Client objectStorageClient;
     private final String BUCKET_NAME = "paran-test";
-    private final String FOLDER_NAME = "test/";
 
     @Override
     public Boolean uploadFile(MultipartFile file, String type, Long refId) {
@@ -36,7 +36,8 @@ public class FileServiceImpl implements FileService {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(0L);
         objectMetadata.setContentType("application/x-directory");
-        PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, FOLDER_NAME, new ByteArrayInputStream(new byte[0]), objectMetadata);
+        String folderName = type+"s/";
+        PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, folderName, new ByteArrayInputStream(new byte[0]), objectMetadata);
         try {
             objectStorageClient.putObject(putObjectRequest);
         } catch (SdkClientException e) {
@@ -46,7 +47,7 @@ public class FileServiceImpl implements FileService {
 //        upload file
         try {
             var fileName = file.getOriginalFilename();
-            var uploadName = FOLDER_NAME + UUID.randomUUID() + fileName.substring(fileName.lastIndexOf("."));
+            var uploadName = folderName + UUID.randomUUID() + fileName.substring(fileName.lastIndexOf("."));
 
             // MultipartFile의 InputStream을 사용하여 업로드
             objectStorageClient.putObject(BUCKET_NAME, uploadName, file.getInputStream(), new ObjectMetadata());

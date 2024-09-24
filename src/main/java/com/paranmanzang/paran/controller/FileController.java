@@ -1,7 +1,7 @@
 package com.paranmanzang.paran.controller;
 
 import com.paranmanzang.paran.model.domain.FileDeleteModel;
-import com.paranmanzang.paran.service.FileServiceImpl;
+import com.paranmanzang.paran.service.impl.FileServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
