@@ -1,4 +1,4 @@
-package com.paranmanzang.paran;
+package com.paranmazang.paran;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

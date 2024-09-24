@@ -1,4 +1,4 @@
-package com.paranmanzang.paran.model.domain;
+package com.paranmazang.paran.model.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
