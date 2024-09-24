@@ -33,7 +33,7 @@ public class FileServiceImpl implements FileService {
     private final String BUCKET_NAME = "paran-test";
 
     @Override
-    public Boolean uploadFile(MultipartFile file, String type, Long refId) {
+    public Boolean uploadFile(MultipartFile file, String type, Long refId) throws SdkClientException{
         //        create folder
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(0L);
@@ -43,7 +43,7 @@ public class FileServiceImpl implements FileService {
         try {
             objectStorageClient.putObject(putObjectRequest);
         } catch (SdkClientException e) {
-            e.printStackTrace();
+            throw new SdkClientException(e.getMessage());
         }
 
 //        upload file

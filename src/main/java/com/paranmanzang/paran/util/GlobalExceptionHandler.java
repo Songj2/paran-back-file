@@ -1,5 +1,6 @@
 package com.paranmanzang.paran.util;
 
+import com.amazonaws.SdkClientException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -15,26 +16,13 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<?> bindException(BindException e) {
-        return ResponseEntity.badRequest().body(
-                new ExceptionResponseModel("BE", "Bind Exception", e.getFieldErrors().stream()
-                        .map(fieldError -> new ErrorField(
-                                fieldError.getRejectedValue(),
-                                fieldError.getDefaultMessage()))
-                        .toList()));
-    }
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<?> httpMessageNoReadableException(HttpMessageNotReadableException e){
+    @ExceptionHandler(SdkClientException.class)
+    public ResponseEntity<?> cloudException(SdkClientException e){
         List<ErrorField> errors= new ArrayList<>();
-        if (e.getCause() instanceof InvalidFormatException){
-            errors.add(new ErrorField(((InvalidFormatException) e.getCause()).getValue(), e.getMessage()));
-        }
-
+        errors.add(new ErrorField("", e.getMessage().substring(0, e.getMessage().indexOf("("))));
         return ResponseEntity.badRequest().body(
-                new ExceptionResponseModel("NR", "HttpMessageNoReadableException", errors)
+                new ExceptionResponseModel("CE", "SdkClientException", errors)
         );
-
     }
 
 }
