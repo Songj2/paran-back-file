@@ -1,4 +1,4 @@
-package com.paranmazang.paran.util;
+package com.paranmanzang.paran.util;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.ResponseEntity;
@@ -6,8 +6,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import com.paranmazang.paran.model.domain.ErrorField;
-import com.paranmazang.paran.model.domain.ExceptionResponseModel;
+import com.paranmanzang.paran.model.domain.ErrorField;
+import com.paranmanzang.paran.model.domain.ExceptionResponseModel;
 
 import java.util.ArrayList;
 import java.util.List;

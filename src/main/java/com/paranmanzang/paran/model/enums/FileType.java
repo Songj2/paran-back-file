@@ -1,4 +1,4 @@
-package com.paranmazang.paran.model.enums;
+package com.paranmanzang.paran.model.enums;
 
 import lombok.Getter;
 

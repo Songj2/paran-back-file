@@ -1,4 +1,4 @@
-package com.paranmazang.paran.config;
+package com.paranmanzang.paran.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
