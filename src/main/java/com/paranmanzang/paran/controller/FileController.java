@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+
 @RestController
 @CrossOrigin
 @Tag(name = "01. File")
@@ -19,7 +20,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class FileController {
     private final FileServiceImpl fileService;
-
 
     @GetMapping("/list/{refId}")
     @Operation(summary = "리스트 조회", description = "type의 refId인 파일 path 리스트를 조회합니다.", tags = {"01. File",})

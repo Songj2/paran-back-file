@@ -14,7 +14,7 @@ public class FileCustomRepositoryImpl implements FileCustomRepository {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Override
-    public Flux<?> findByRefId(Long refId, int type) {
+    public Flux<File> findByRefId(Long refId, int type) {
         return reactiveMongoTemplate.find(Query.query(Criteria.where("refId").is(refId).and("type").is(type)), File.class);
     }
 

@@ -8,12 +8,12 @@ import com.amazonaws.util.IOUtils;
 import com.paranmanzang.paran.model.entity.File;
 import com.paranmanzang.paran.model.domain.FileDeleteModel;
 import com.paranmanzang.paran.model.enums.FileType;
-import com.paranmanzang.paran.model.repository.FileCustomRepository;
+import com.paranmanzang.paran.model.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
-    private final FileCustomRepository fileRepository;
+    private final FileRepository fileRepository;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     private final AmazonS3Client objectStorageClient;
@@ -64,8 +64,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Flux<?> getPathList(Long refId, String type) {
-        return fileRepository.findByRefId(refId, FileType.fromType(type).getCode());
+    public Mono<?> getPathList(Long refId, String type) {
+        return fileRepository.findByRefId(refId, FileType.fromType(type).getCode()).then();
     }
 
     @Override
