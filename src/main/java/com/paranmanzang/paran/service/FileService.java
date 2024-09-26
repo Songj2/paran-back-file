@@ -1,13 +1,14 @@
 package com.paranmanzang.paran.service;
 
 import com.paranmanzang.paran.model.domain.FileDeleteModel;
+import com.paranmanzang.paran.model.domain.FileModel;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface FileService {
-    Boolean uploadFile(MultipartFile file, String type, Long refId);
+    FileModel uploadFile(MultipartFile file, String type, Long refId) throws IOException;
     List<?> getPathList(Long refId, String type);
     byte[] getFile(String path) throws IOException;
     Boolean delete(FileDeleteModel model);

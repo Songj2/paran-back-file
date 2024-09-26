@@ -4,6 +4,7 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.util.IOUtils;
 import com.paranmanzang.paran.model.domain.FileModel;
 import com.paranmanzang.paran.model.entity.File;
@@ -15,12 +16,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,45 +34,54 @@ public class FileServiceImpl implements FileService {
     private final AmazonS3Client objectStorageClient;
     private final String BUCKET_NAME = "paran-test";
 
-    @Override
-    public Boolean uploadFile(MultipartFile file, String type, Long refId) throws SdkClientException{
-        //        create folder
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(0L);
-        objectMetadata.setContentType("application/x-directory");
-        String folderName = type+"s/";
-        PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, folderName, new ByteArrayInputStream(new byte[0]), objectMetadata);
-        try {
-            objectStorageClient.putObject(putObjectRequest);
-        } catch (SdkClientException e) {
-            throw new SdkClientException(e.getMessage());
-        }
+    public FileModel uploadFile(MultipartFile file, String type, Long refId) {
+        String folderName = type + "s/";
+        String fileName = file.getOriginalFilename();
+        String uploadName = folderName + UUID.randomUUID() + Objects.requireNonNull(fileName).substring(fileName.lastIndexOf("."));
 
-//        upload file
-        try {
-            var fileName = file.getOriginalFilename();
-            var uploadName = folderName + UUID.randomUUID() + fileName.substring(fileName.lastIndexOf("."));
-
-            // MultipartFile의 InputStream을 사용하여 업로드
-            objectStorageClient.putObject(BUCKET_NAME, uploadName, file.getInputStream(), new ObjectMetadata());
-            reactiveMongoTemplate.insert(File.builder()
-                    .path(uploadName)
-                    .refId(refId)
-                    .type(FileType.fromType(type).getCode())
-                    .uploadAt(LocalDateTime.now())
-                    .build()).block();
-        } catch (SdkClientException | IOException e) {
-            e.printStackTrace();
-        }
-
-        return true;
+        return Optional.of(new PutObjectRequest(BUCKET_NAME, folderName, new ByteArrayInputStream(new byte[0]), new ObjectMetadata()))
+                .map(this::createFolder)
+                .map(__ -> uploadFileToStorage(file, uploadName))
+                .map(__ -> saveFileMetadata(uploadName, refId, type))
+                .map(this::convertToFileModel)
+                .orElseThrow(() -> new RuntimeException("Failed to upload file"));
     }
+
+    private PutObjectResult createFolder(PutObjectRequest request) {
+        try {
+            return objectStorageClient.putObject(request);
+        } catch (SdkClientException e) {
+            throw new RuntimeException("Failed to create folder: " + e.getMessage(), e);
+        }
+    }
+
+    private PutObjectResult uploadFileToStorage(MultipartFile file, String uploadName) {
+        try {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(file.getSize());
+            metadata.setContentType(file.getContentType());
+            return objectStorageClient.putObject(BUCKET_NAME, uploadName, file.getInputStream(), metadata);
+        } catch (IOException | SdkClientException e) {
+            throw new RuntimeException("Failed to upload file: " + e.getMessage(), e);
+        }
+    }
+
+    private File saveFileMetadata(String uploadName, Long refId, String type) {
+        return Optional.of(File.builder()
+                        .path(uploadName)
+                        .refId(refId)
+                        .type(FileType.fromType(type).getCode())
+                        .uploadAt(LocalDateTime.now())
+                        .build())
+                .map(file -> reactiveMongoTemplate.insert(file).block())
+                .orElseThrow(() -> new RuntimeException("Failed to save file metadata"));
+    }
+
 
     @Override
     public List<?> getPathList(Long refId, String type) {
         return fileRepository.findByRefId(refId, FileType.fromType(type).getCode())
-                .map(file ->
-                        new FileModel(file.getId(), FileType.fromCode(file.getType()).getType(), file.getPath(), file.getRefId(), file.getUploadAt()))
+                .map(this::convertToFileModel)
                 .collectList().block();
     }
 
@@ -86,5 +97,16 @@ public class FileServiceImpl implements FileService {
         objectStorageClient.deleteObject(BUCKET_NAME, model.getPath());
         fileRepository.deleteByPath(model.getPath()).block();
         return Boolean.TRUE;
+    }
+    private FileModel convertToFileModel(File file) {
+        return Optional.ofNullable(file)
+                .map(f -> FileModel.builder()
+                        .id(f.getId())
+                        .path(f.getPath())
+                        .refId(f.getRefId())
+                        .type(FileType.fromCode(f.getType()).getType())
+                        .uploadAt(f.getUploadAt())
+                        .build())
+                .orElseThrow(() -> new RuntimeException("Failed to convert to FileModel"));
     }
 }
