@@ -1,10 +1,7 @@
 package com.paranmanzang.paran.books.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Entity
 @Data
