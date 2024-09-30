@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Configuration;
 public class S3Config {
 
 
-    @Value("${cloud.s3.access-id}")
-    private String s3AccessId;
+    @Value("${cloud.s3.access-key}")
+    private String s3AccessKey;
 
-    @Value("${cloud.s3.secret-key}")
+    @Value("${cloud.s3.access-secret-key}")
     private String s3SecretKey;
 
     @Bean
@@ -30,7 +30,7 @@ public class S3Config {
                 .standard()
                 .withCredentials(
                         new AWSStaticCredentialsProvider(
-                                new BasicAWSCredentials(s3AccessId, s3SecretKey)
+                                new BasicAWSCredentials(s3AccessKey, s3SecretKey)
                         )
                 )
                 .withClientConfiguration(clientConfig)

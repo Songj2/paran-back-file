@@ -124,7 +124,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public Mono<Void> transferFilesToS3() {
         var start= 740;
-        var end= 1705;
+        var end= 1704;
         return fileRepository.findByType(FileType.fromType("book").getCode())
                 .filter(file -> file.getRefId()>=start && file.getRefId()<=end)
                 .flatMap(file -> Mono.fromCallable(() -> objectStorageClient().getObject(BUCKET_NAME, file.getPath()))
