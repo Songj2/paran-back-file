@@ -14,13 +14,16 @@ import java.io.IOException;
 
 
 @RestController
-@CrossOrigin
 @Tag(name = "01. File")
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
 public class FileController {
     private final FileServiceImpl fileService;
 
+    @GetMapping("/move")
+    public void moveToS3(){
+        fileService.transferFilesToS3().block();
+    }
     @GetMapping("/list/{refId}")
     @Operation(summary = "리스트 조회", description = "type의 refId인 파일 path 리스트를 조회합니다.", tags = {"01. File",})
     public ResponseEntity<?> getPathByRefId(@PathVariable("refId") Long refId, @RequestParam("type") String type) {

@@ -3,6 +3,7 @@ package com.paranmanzang.paran.service;
 import com.paranmanzang.paran.model.domain.FileDeleteModel;
 import com.paranmanzang.paran.model.domain.FileModel;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,4 +13,5 @@ public interface FileService {
     List<?> getPathList(Long refId, String type);
     byte[] getFile(String path) throws IOException;
     Boolean delete(FileDeleteModel model);
+    Mono<Void> transferFilesToS3();
 }
