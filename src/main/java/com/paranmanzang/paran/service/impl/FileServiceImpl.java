@@ -89,7 +89,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public List<?> getPathList(Long refId, String type) {
+    public List<FileModel> getPathList(Long refId, String type) {
         return fileRepository.findByRefId(refId, FileType.fromType(type).getCode())
                 .map(this::convertToFileModel)
                 .collectList().block();
@@ -102,6 +102,9 @@ public class FileServiceImpl implements FileService {
                 .getObjectContent());
     }
 
+    public byte[] getFileByRefId(Long refId, String type) throws IOException {
+        return IOUtils.toByteArray(amazonS3.getObject(s3bucket, getPathList(refId, type).get(0).getPath()).getObjectContent());
+    }
     @Override
     public Boolean delete(FileDeleteModel model) {
         amazonS3.deleteObject(s3bucket, model.getPath());
